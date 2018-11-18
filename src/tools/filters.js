@@ -5,7 +5,9 @@ const filters = [
     max: 2,
     units: '',
     canvasName: 'brightness',
-    defaultValue: 0.5
+    value: 0.5,
+    presentValue: 0.5,
+    active: false
   },
   {
     name: 'Размытие',
@@ -13,7 +15,9 @@ const filters = [
     max: 2,
     units: 'px',
     canvasName: 'blur',
-    defaultValue: 1
+    value: 1,
+    presentValue: 1,
+    active: false
   },
   {
     name: 'Контраст',
@@ -21,7 +25,9 @@ const filters = [
     max: 400,
     units: '%',
     canvasName: 'contrast',
-    defaultValue: 50
+    value: 50,
+    presentValue: 50,
+    active: false
   },
   {
     name: 'Серый',
@@ -29,7 +35,9 @@ const filters = [
     max: 100,
     units: '%',
     canvasName: 'grayscale',
-    defaultValue: 0
+    value: 0,
+    presentValue: 0,
+    active: false
   },
   {
     name: 'hue-rotate',
@@ -37,7 +45,9 @@ const filters = [
     max: 180,
     units: 'deg',
     canvasName: 'hue-rotate',
-    defaultValue: 0
+    value: 0,
+    presentValue: 0,
+    active: false
   },
   {
     name: 'Инверсия',
@@ -45,7 +55,9 @@ const filters = [
     max: 100,
     units: '%',
     canvasName: 'invert',
-    defaultValue: 0
+    value: 0,
+    presentValue: 0,
+    active: false
   },
   {
     name: 'Непрозрачность',
@@ -53,7 +65,9 @@ const filters = [
     max: 100,
     units: '%',
     canvasName: 'opacity',
-    defaultValue: 100
+    value: 100,
+    presentValue: 100,
+    active: false
   },
   {
     name: 'saturable',
@@ -61,7 +75,9 @@ const filters = [
     max: 100,
     units: '%',
     canvasName: 'saturate',
-    defaultValue: 100
+    value: 100,
+    presentValue: 100,
+    active: false
   },
   {
     name: 'sepia',
@@ -69,7 +85,9 @@ const filters = [
     max: 100,
     units: '%',
     canvasName: 'sepia',
-    defaultValue: 100
+    value: 100,
+    presentValue: 100,
+    active: false
   }
 ]
 

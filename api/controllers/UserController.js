@@ -9,7 +9,6 @@ const User = require("../models/User");
 const fs = require('fs');
 const Image = require('../models/Image');
 const Subscribe = require('../models/Subscribe');
-const Like = require('../models/Like');
 
 exports.getUser = (req, res, next) => {
   let user = {
@@ -48,7 +47,7 @@ exports.getUser = (req, res, next) => {
     if(poster) user.poster = {src: 'http://' + req.headers.host + '/' + poster.src};
     return res.send(user);
   }).catch(e => {
-    console.log(e);
+    console.log(e)
     return res.status(e.status || 500).send(e);
   })
 };
@@ -160,7 +159,7 @@ exports.subscribe = (req, res, next) => {
     _id: mongoose.Types.ObjectId()
   }
   if(req.user.id == id) return res.status(422).send('Вы не можете подписаться на себя');
-  User.findOne({_id: id}).exec().then(user => {
+  User.findOne({_id: id}).then(user => {
     if(!user) throw {
       status: 404,
       message: 'Пользователь не найден'
@@ -210,6 +209,7 @@ exports.getUsers = (req, res) => {
 
 exports.search = (req, res) => {
   const query = req.query.s;
+  let results = [];
   if(!query) return res.send([]);
   const regexp = new RegExp(query, 'ig');
   User.find({$or: [{
@@ -217,8 +217,12 @@ exports.search = (req, res) => {
   }, {
     login: regexp
   }]
-  }).then(data => {
-    res.send(data);
+  }).populate('poster').then(data => {
+    results = [].concat(data)
+    results.forEach(user => {
+      user.poster = user.poster ? 'http://' + req.headers.host + '/' + user.poster : '';
+    })
+    res.send(results);
   }).catch(e => {
     console.log(e);
     res.status(500).send(e)
@@ -310,4 +314,51 @@ exports.removeAvatar = (req, res) => {
     res.send(e)
   })
   
+}
+
+exports.getSubscribers = (req, res, next) => {
+  returnUserList('whom', 'who', req, res, next)
+}
+exports.getSubscribes = (req, res, next) => {
+  returnUserList('who', 'whom', req, res, next)
+}
+function returnUserList (obj, subj, req, res, next) {
+  const login = req.query.userLogin;
+  let list; 
+  User.findOne({login})
+    .then(user => {
+      if (!user) throw {
+        status: 404,
+        message: 'User not found'
+      }
+      return Subscribe.find({[obj]: user._id}).populate({
+        path: subj,
+        populate: {
+          path: "poster"
+        }
+      })
+    }).then(subscribers => {
+      list = [];
+      subscribers.forEach(sub => {
+        let res = {
+          ...sub._doc[subj]._doc
+        };
+        if (res.poster) res.poster.src = 'http://' + req.headers.host + '/' + res.poster.src;
+        list.push(res);
+      })
+      return Subscribe.find({who: req.user.id}, {password: 0, __v: 0})
+    }).then(currentUserSubscribes => {
+      list.forEach(item => {
+        const index = currentUserSubscribes.findIndex(sub => {
+          return sub.whom.toString() === item._id.toString()
+        })
+        if (~index) {
+          item.subscribed = true
+        }
+      })
+      res.send({list})
+    }).catch(e => {
+      
+      next(e)
+    })
 }

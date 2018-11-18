@@ -39,7 +39,6 @@ ImageSchema.statics.getAllByUser = function (user_id,host, cb) { // user = id
 ImageSchema.statics.getAll = function (users, host, cb) { //user = Array
   let res;
   return this.find({user_id: users, isProfile: false}, {__v: 0, password: 0}).populate('comments.user_id').populate('user_id', {password: 0, __v: 0}).populate('poster').then(posts => {
-    console.log(posts);
     res = JSON.parse(JSON.stringify(posts));
     res.forEach(post => {
       post.src = 'http://' + host + '/' + post.src;

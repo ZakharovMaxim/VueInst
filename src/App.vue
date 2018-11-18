@@ -1,19 +1,26 @@
 <template>
   <div id="app">
     <router-view></router-view>
+    <router-view name='list'></router-view>
+    <sticky />
   </div>
 </template>
 
 <script>
+import {mapActions} from 'vuex'
 import debounce from './tools/Debounce'
+import Network from './tools/Network'
+import sticky from './components/sticky'
 export default {
   name: 'App',
-  beforeCreate () {
-    this.$store.dispatch('getToken')
+  created () {
+    this.getToken()
+    Network.initInterceptors(this)
     const callback = debounce((e) => this.fixNavigation(e), 100)
     window.addEventListener('scroll', callback)
   },
   methods: {
+    ...mapActions(['removeToken', 'getToken']),
     fixNavigation (e) {
       if (!e) return
       const w = window
@@ -23,7 +30,8 @@ export default {
         this.$store.dispatch('unFixNavigation')
       }
     }
-  }
+  },
+  components: {sticky}
 }
 </script>
 
@@ -36,14 +44,20 @@ body, html, #app {
   background-color: #FAFAFA;
   font-family: 'Open Sans';
 }
+#app {
+  height: 1px;
+}
 .content {
-  flex: 1 0 auto;
+  width: 100%;
   max-width: 860px;
   margin: 0 auto;
 }
 .w100 {
     width: 100%;
   }
+button {
+  cursor: pointer;
+}
 * {
   padding: 0;
   margin: 0;

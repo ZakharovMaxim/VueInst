@@ -24,5 +24,10 @@ export default {
     if (!post) return
     const index = post.comments.findIndex(comment => comment._id === payload.id)
     if (index !== -1) post.comments.splice(index, 1)
+  },
+  removePost (state, postId) {
+    const index = state.posts.findIndex(post => post._id === postId)
+    if (!~index) return
+    state.posts.splice(index, 1)
   }
 }

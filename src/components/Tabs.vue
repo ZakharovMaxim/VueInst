@@ -17,8 +17,8 @@
   </div>
 </template>
 <script>
-import changePasswordForm from './change-password-form'
-import changeUser from './change-user'
+import changePasswordForm from './ChangeInfo/change-password-form'
+import changeUser from './ChangeInfo/change-user'
 export default {
   name: 'tabs',
   data () {

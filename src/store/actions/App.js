@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from '../../configs/axios'
 export default {
   fixNavigation ({commit}) {
     commit('fixNavigation')
@@ -8,10 +8,8 @@ export default {
   },
   search ({commit}, s) {
     if (!s) return commit('setSearch', [])
-    axios.get('http://localhost:3000/search?s=' + s).then(data => {
+    axios.get('/search?s=' + s).then(data => {
       commit('setSearch', data.data)
-    }).catch(e => {
-      console.log(e)
     })
   }
 }

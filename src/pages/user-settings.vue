@@ -1,18 +1,18 @@
 <template>
-  <Content>
+  <content-vue>
     <tabs :user='currentUser'/>
-  </Content>
+  </content-vue>
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import Content from '../components/content'
-import Tabs from '../components/Tabs'
+import ContentVue from '../components/Layout/content-vue'
+import Tabs from '../components/tabs'
 export default {
   name: 'user-settings',
   computed: {
     ...mapGetters(['currentUser'])
   },
-  components: {Content, Tabs}
+  components: {ContentVue, Tabs}
 }
 </script>
 <style>

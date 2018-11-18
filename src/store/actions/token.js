@@ -1,29 +1,37 @@
-let b64DecodeUnicode = str =>
-  decodeURIComponent(
-    Array.prototype.map.call(atob(str), c =>
-      '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-    ).join(''))
+let b64DecodeUnicode = str => {
+  try {
+    return decodeURIComponent(
+      Array.prototype.map.call(atob(str), c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''))
+  } catch (e) {
+    return null
+  }
+}
 
-let parseJwt = token =>
-  JSON.parse(
+let parseJwt = token => {
+  const [part1, part2] = token.split('.')
+  if (!part1 || !part2) return null
+  return JSON.parse(
     b64DecodeUnicode(
-      token.split('.')[1].replace('-', '+').replace('_', '/')
+      part2.replace('-', '+').replace('_', '/')
     )
   )
+}
+
 export default {
   setToken ({ commit }, payload) {
-    console.log(payload)
-    localStorage.setItem('token', payload.token)
+    localStorage.setItem('token', payload.token || '')
     commit('setToken', payload)
   },
   removeToken ({ commit }) {
-    localStorage.setItem('token', '')
-    commit('setToken', '')
+    commit('setToken', {token: '', user: null})
   },
   getToken ({ commit }) {
     let token = localStorage.getItem('token') || ''
     if (!token) return commit('setToken', {token: '', user: {}})
     const user = parseJwt(token)
-    if (token) commit('setToken', {token, user})
+    if (!user) token = ''
+    commit('setToken', {token, user})
   }
 }

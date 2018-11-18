@@ -1,12 +1,12 @@
 <template>
   <div class="main">
-    <MainForm></MainForm>
+    <main-form />
   </div>
 </template>
 <script>
-import MainForm from '../components/MainForm'
+import MainForm from '../components/Forms/main-form'
 export default {
-  name: 'LoginPage',
+  name: 'login-page',
   components: {MainForm}
 }
 </script>

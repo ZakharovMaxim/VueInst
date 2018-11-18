@@ -11,10 +11,16 @@ export const store = new vuex.Store({
     user: {},
     userInfo: {},
     login: false,
-    posts: [],
+    posts: null,
     token: null,
     fixedNavigation: false,
-    searchResult: []
+    searchResult: [],
+    filters: [],
+    appliedFilters: [],
+    filteredImg: null,
+    subscribers: [],
+    subscribes: [],
+    loading: false
   },
   getters,
   mutations,

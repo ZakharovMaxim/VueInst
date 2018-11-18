@@ -11,7 +11,9 @@ router.post('/addPost', UserPolicies.isAuth, PostController.addPost);
 router.post('/editPost', UserPolicies.isAuth, PostController.editPost);
 router.get('/getPost', UserPolicies.isAuth, PostController.getPost);
 router.get('/getAllPostsByUser', UserPolicies.isAuth, PostController.getAllPostsByUser);
-router.delete('/removePost', UserPolicies.isAuth, UserPolicies.isHis,  PostController.removePost);
+router.get('/getSubscribers', UserPolicies.isAuth, UserController.getSubscribers)
+router.get('/getSubscribes', UserPolicies.isAuth, UserController.getSubscribes)
+router.delete('/removePost/:id', UserPolicies.isAuth, UserPolicies.isHis, PostController.removePost);
 router.post('/changeinfo',  UserPolicies.isAuth, userValidation.changeInfo, UserController.changeInfo);
 router.post('/changepassword', UserPolicies.isAuth, UserController.changePassword);
 router.post('/comment', UserPolicies.isAuth, PostController.comment);

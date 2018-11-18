@@ -41,80 +41,37 @@ exports.editPost = (req, res) => {
     });
 };
 exports.addPost = (req, res, next) => {
-  let isProfile = false,
-    data,
-    update = false,
-    id = "",
-    description;
-  let promise = new Promise((resolve, reject) => {
-    const form = new multiparty.Form();
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      if (fields.isProfile && !!+fields.isProfile[0]) isProfile = true;
-      description = fields.description;
-      resolve(files);
+  const row = req.body.image.replace(/^data:image\/png;base64,/, "");
+  const description = req.body.description;
+  const dir = `public/images/user/${req.user.login}`;
+  const fileName = `images/user/${req.user.login}/${+new Date()}.png`;
+  
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
+  // write file
+  //
+  new Promise((resolve, reject) => {
+    fs.writeFile(`./public/${fileName}`, row, 'base64', function(err) {
+      if(err) reject(err);
+      resolve()
     });
-  });
-  promise
-    .then(files => {
-      const uploadFolder = path.resolve(
-        __dirname,
-        "../public/images/user/" + req.user.login
-      );
-      return service.upload(files.image[0], uploadFolder);
-    })
-    .then(result => {
-      if (result.status === 500) throw result;
-      data = {
-        src: "images/user/" + req.user.login + "/" + result.name,
-        date: new Date(),
-        user_id: req.user.id,
-        description,
-        isProfile
-      };
-      if (!isProfile) {
-        data._id = mongoose.Types.ObjectId();
-        let image = new Image(data);
-        return image.save();
-      } else {
-        update = true;
-        return false;
-      }
-    })
-    .then(data => {
-      if (!data) {
-        return Image.findOne({ user_id: req.user.id, isProfile: true });
-      } else {
-        id = data._id;
-        return false;
-      }
-    })
-    .then(img => {
-      if (img) {
-        return service.deleteImage(img.src);
-      } else {
-        return;
-      }
-    })
-    .then(() => {
-      if (update) {
-        return Image.update({ user_id: req.user.id, isProfile: true }, data, {
-          upsert: true
-        });
-      } else return;
-    })
-    .then(data => {
-      if (data && data.upserted) {
-        id = data.upserted[0]._id;
-      }
-      res.send(id);
-    })
-    .catch(err => {
-      if (err) res.status(500).send(err);
-    });
-};
+  }).then(() => {
+    const image = new Image();
+    image.description = description;
+    image._id = mongoose.Types.ObjectId();
+    image.src = fileName;
+    image.user_id = req.user.id;
+    return image.save();
+  }).then(() => {
+    res.send('ok')
+  }).catch(e => {
+    console.log(e);
+    next(e)
+  })
+  };
 exports.removePost = (req, res, next) => {
-  Image.remove({ _id: req.body.post_id })
+  Image.remove({ _id: req.params.id })
     .exec()
     .then(() => {
       res.status(200).send("ok");
@@ -237,7 +194,9 @@ exports.getAllPosts = (req, res) => {
     const ids = subs.map(s => s.whom);
     return Image.getAll(ids, req.headers.host);
   }).then(posts => {
-    return res.send(posts);
+    setTimeout(() => {
+      return res.send(posts);
+    }, 5000)
   }).catch(e => {
     console.log(e);
     return res.status(500).send(e);

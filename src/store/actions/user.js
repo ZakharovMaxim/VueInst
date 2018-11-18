@@ -1,12 +1,13 @@
-import axios from 'axios'
+import axios from '../../configs/axios'
+
 export default {
   getUser ({commit}, login) {
-    const token = localStorage.getItem('token')
     return axios
-      .get('http://localhost:3000/user/getUser?login=' + login, {
-        headers: { Authorization: `JWT ${token}`, withCredentials: true }
+      .get('/user/getUser?login=' + login, {
+        headers: { Authorization: true, withCredentials: true }
       })
       .then(data => {
+        if (!data) throw new Error({status: 404, message: 'Пользователь не найден'})
         const user = {
           login: data.data.login,
           name: data.data.name,
@@ -17,44 +18,36 @@ export default {
           subscriber: data.data.subscriber,
           id: data.data._id
         }
-        commit('setPosts', data.data.posts)
-        commit('setUserInfo', user)
+        commit('setUserInfo', {
+          user,
+          posts: data.data.posts
+        })
         return data
-      })
-      .catch(e => {
-        console.dir(e)
       })
   },
   changeInfo ({commit}, payload) {
     commit('setToken', payload)
   },
   sub ({commit}, id) {
-    const token = localStorage.getItem('token')
     return axios
-      .post('http://localhost:3000/user/subscribe', {user_id: id}, {
-        headers: { Authorization: `JWT ${token}`, withCredentials: true }
+      .post('/user/subscribe', {user_id: id}, {
+        headers: { Authorization: true, withCredentials: true }
       }).then(data => {
         commit('sub', id)
-      }).catch(e => {
-        console.log(e)
       })
   },
   unsub ({commit}, id) {
-    const token = localStorage.getItem('token')
     return axios
-      .post('http://localhost:3000/user/unsubscribe', {user_id: id}, {
-        headers: { Authorization: `JWT ${token}`, withCredentials: true }
+      .post('/user/unsubscribe', {user_id: id}, {
+        headers: { Authorization: true, withCredentials: true }
       }).then(data => {
         commit('unsub', id)
-      }).catch(e => {
-        console.log(e)
       })
   },
   changeAvatar ({commit}, data) {
-    const token = localStorage.getItem('token')
     return axios
-      .post('http://localhost:3000/user/changeAvatar', data, {
-        headers: { Authorization: `JWT ${token}`, withCredentials: true, 'Content-Type': 'multipart/form-data' }
+      .post('/user/changeAvatar', data, {
+        headers: { Authorization: true, withCredentials: true, 'Content-Type': 'multipart/form-data' }
       }).then(data => {
         commit('changeAvatar', {
           src: data.data.src,
@@ -63,12 +56,10 @@ export default {
       })
   },
   removeAvatar ({commit}) {
-    const token = localStorage.getItem('token')
     return axios
-      .post('http://localhost:3000/user/removeAvatar', {}, {
-        headers: {Authorization: `JWT ${token}`, withCredentials: true}
+      .post('/user/removeAvatar', {}, {
+        headers: {Authorization: true, withCredentials: true}
       }).then(data => {
-        console.log(data)
         commit('changeAvatar', {
           src: '',
           token: data.data.token
@@ -76,9 +67,24 @@ export default {
       })
   },
   changePassword ({commit}, payload) {
-    const token = localStorage.getItem('token')
-    return axios.post('http://localhost:3000/user/changePassword', payload, {
-      headers: {Authorization: `JWT ${token}`, withCredentials: true}
+    return axios.post('/user/changePassword', payload, {
+      headers: {Authorization: true, withCredentials: true}
+    })
+  },
+  getSubscribes ({commit}, userLogin) {
+    return axios.get('/user/getSubscribes?userLogin=' + userLogin, {
+      headers: {Authorization: true, withCredentials: true}
+    }).then(response => {
+      commit('setSubscribes', response.data.list)
+      return response
+    })
+  },
+  getSubscribers ({commit}, userLogin) {
+    return axios.get('/user/getSubscribers?userLogin=' + userLogin, {
+      headers: {Authorization: true, withCredentials: true}
+    }).then(response => {
+      commit('setSubscribers', response.data.list)
+      return response
     })
   }
 }

@@ -18,12 +18,12 @@ exports.isAuth = (req, res, next) => {
 }
 
 exports.isHis = (req, res, next) => {
-  let type = req.body.type;
+  let type = req.query.type;
   if(!type) return res.status(403).send({
     status: 403,
     message: 'Это не твой пост, брат'
   });
-  const id = req.body.post_id;
+  const id = req.params.id;
   switch(type) {
     case "post": {
       Image.findOne({_id: id, user_id: req.user.id}).exec().then(img => {

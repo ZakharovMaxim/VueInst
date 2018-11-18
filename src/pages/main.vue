@@ -1,21 +1,22 @@
 <template>
-      <Content v-if='isAuth'>
-        <MainPageContent />
-      </Content>
+      <div v-if='isAuth'>
+        <main-page-content />
+      </div>
       <div v-else class='w100'>
-        <LoginPage />
+        <login-page />
       </div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
 import LoginPage from './login'
-import MainPageContent from '../components/MainPageContent'
+import MainPageContent from '../components/Layout/main-page-content'
+import Content from '../components/Layout/content-vue'
 export default {
-  name: 'contentVue',
+  name: 'main-page',
   computed: {
     ...mapGetters(['isAuth'])
   },
-  components: {LoginPage, MainPageContent}
+  components: {LoginPage, MainPageContent, Content}
 }
 </script>
 <style>

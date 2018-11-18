@@ -1,20 +1,24 @@
 <template>
-  <Content>
+  <content-vue>
     <div v-if='!newPost'>
-      <user-header :user='userInfo' :controlls='userInfo.id === currentUser.id' @loaded='loaded'/>
-      <PostList :posts='posts' :postType='"user"' />
+      <fetch-data :callback='fetch'>
+        <user-header :user='userInfo' :controlls='userInfo.id === currentUser.id' @loaded='loaded'/>
+        <post-list :posts='posts' :postType='"user"' />
+      </fetch-data>
     </div>
-    <new-post v-else :img='newPostImg' @newPhoto='loaded'/>
-  </Content>
+    <new-post v-else :img='newPostImg' @newPhoto='loaded' />
+  </content-vue>
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import Content from '../components/content'
-import PostList from '../components/Post/PostList'
-import UserHeader from '../components/UserHeader'
-import newPost from '../components/new-post'
+import contentVue from '../components/Layout/content-vue'
+import loader from '../components/Layout/loading-user'
+import PostList from '../components/Post/post-list'
+import UserHeader from '../components/Layout/user-header'
+import newPost from '../components/NewPost/new-post'
+import fetchData from '../components/fetch-data'
 export default {
-  name: 'contentVue',
+  name: 'user-page',
   data () {
     return {
       newPost: false,
@@ -25,16 +29,15 @@ export default {
     loaded (obj) {
       this.newPostImg = obj
       this.newPost = true
+    },
+    fetch () {
+      return this.$store.dispatch('getUser', this.$route.params.login)
     }
   },
   computed: {
     ...mapGetters(['isAuth', 'posts', 'userInfo', 'currentUser'])
   },
-  created () {
-    this.$store.dispatch('getUser', this.$route.params.login).then(data => {
-    })
-  },
-  components: {Content, PostList, UserHeader, newPost}
+  components: {contentVue, PostList, UserHeader, newPost, fetchData, loader}
 }
 </script>
 <style>
