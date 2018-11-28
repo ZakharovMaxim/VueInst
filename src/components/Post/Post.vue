@@ -1,78 +1,209 @@
 <template>
-    <div class="post" :key="post._id" :class='{"post-user": postType === "user", "post-full": postType === "full"}'>
-      <PostTitle :user='post.user_id' v-if='postType === "subs"' :rights='removeRights' :postId="post._id" />
-      <PostImage :src="post.src" @like='onLike' :liked='liked' :postType='postType' :postId='post._id' @full='fullMode' :likes='post.likes.length' :comments='post.comments.length'/>
-      <PostFooter
-        :user='post.user_id'
-        :description='post.description'
-        :likes='post.likes'
-        :date='post.date'
-        :comments='post.comments'
-        :post_id='post._id'
-        :liked='liked'
-        :onLike='onLike'
-        :postType='postType'
-        :rights='removeRights'
-        v-if='postType !== "user"'
-      />
+    <div class='post-short' v-if='type === "short"' @click='activateFullMode'>
+      <PostImage :src='src' @like='onLike' :liked='liked' :postId='id' />
+      <PostShortStats :likes='likes' :comments='comments.length' />
+    </div>
+    <div class='post-full' v-else-if='type === "full"'>
+      <div class='mobile'>
+        <PostHeader :user='user' :rights='removeRights' :postId='id' />
+      </div>
+      <PostImage :src='src' @like='onLike' :liked='liked' :postId='id' />
+      <div class='desktop'>
+        <div class='post-full__description'>
+          <div class='post-full__text'>
+            <PostHeader :user='user' :rights='removeRights' :postId='id' />
+            <div class='post-full__overflow'>
+              <PostCommentList :user='user' :description='description' :comments='comments' :currentUserId='currentUserId' :postId='id'/>
+            </div>
+            <PostStatsContainer :liked='liked' :likes='likes' @focus='focusCommentInput' @onLike='onLike' />
+          </div>
+          <div class='post-full__new-comment'>
+            <PostNewCommentContainer :id='id' @blur='blurCommentInput' />
+          </div>
+        </div>
+      </div>
+      <div class='mobile'>
+        <div class='post__content'>
+          <PostStatsContainer :liked='liked' :likes='likes' @focus='focusCommentInput' @onLike='onLike' />
+          <PostCommentList :user='user' :description='description' :comments='comments' :currentUserId='currentUserId' :postId='id'/>
+        </div>
+        <PostNewCommentContainer :id='id' @blur='blurCommentInput' />
+      </div>
+    </div>
+    <div class='post' v-else>
+      <PostHeader :user='user' :rights='removeRights' :postId='id' />
+      <PostImage :src='src' @like='onLike' :liked='liked' :postId='id' />
+      <div class='post__content'>
+        <PostStatsContainer :liked='liked' :likes='likes' @focus='focusCommentInput' @onLike='onLike' />
+        <PostCommentList :user='user' :description='description' :comments='comments' :currentUserId='currentUserId' :postId='id'/>
+      </div>
+      <PostNewCommentContainer :id='id' @blur='blurCommentInput' :focusOnNewComment='focusOnNewComment' />
     </div>
 </template>
 
 <script>
-import PostFooter from './post-footer'
-import PostTitle from './post-title'
-import PostImage from './post-image'
-import { mapGetters } from 'vuex'
+import PostNewCommentContainer from './PostNewCommentContainer'
+import PostStatsContainer from './PostStatsContainer'
+import PostShortStats from './PostShortStats'
+import PostHeader from './PostHeader'
+import PostImage from './PostImage'
+import PostCommentList from './PostCommentList'
+
 export default {
-  name: 'post',
-  props: ['post', 'postType'],
-  components: {PostTitle, PostFooter, PostImage},
-  computed: {
-    ...mapGetters(['currentUser']),
-    liked () {
-      return !!~this.post.likes.indexOf(this.currentUser.id)
+  name: 'Post',
+  components: { PostHeader, PostStatsContainer, PostImage, PostCommentList, PostNewCommentContainer, PostShortStats },
+  props: {
+    id: {
+      type: String,
+      required: true
     },
-    removeRights () {
-      return this.currentUser.id === this.post.user_id._id
-    }
+    removeRights: {
+      type: Boolean,
+      required: true
+    },
+    user: {
+      type: Object,
+      required: true
+    },
+    liked: {
+      type: Boolean,
+      required: true
+    },
+    likes: {
+      type: Number,
+      default: 0
+    },
+    src: {
+      type: String
+    },
+    description: {
+      type: String
+    },
+    currentUserId: {
+      type: String,
+      required: true
+    },
+    comments: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    focusOnNewComment: Boolean,
+    type: String
   },
   methods: {
-    fullMode (startId) {
-      this.$emit('full', startId)
-    },
     onLike () {
-      if (this.liked) {
-        this.$store.dispatch('dislike', this.post._id)
-      } else {
-        this.$store.dispatch('like', this.post._id)
-      }
+      this.$emit('onLike')
+    },
+    blurCommentInput () {
+      this.$emit('blurCommentInput')
+    },
+    focusCommentInput () {
+      this.$emit('focusCommentInput')
+    },
+    activateFullMode () {
+      this.$emit('activateFullMode')
     }
   }
 }
 </script>
 
-<style scoped>
+<style>
 .post {
   width: 80%;
   background: #fff;
   margin-bottom: 10px;
 }
+.post .post_img img {
+  width: 100%;
+}
+.post-short {
+  width: 28%;
+  position: relative;
+  cursor: pointer;
+  margin-bottom: 5%;
+}
+.post-short:hover .post-short-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.post-short:not(:last-child) {
+  margin-right: 5.3333%;
+}
+.post-short .post_img {
+  padding-top: 100%;
+  overflow: hidden;
+}
+.post-short .post_img img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+}
 .post-full {
   display: flex;
   flex-wrap: nowrap;
   background: transparent;
-  width: auto;
   max-height: 500px;
+  height: auto;
+  max-width: 80%;
+  justify-content: center;
 }
-.post-user {
-  width: 30%;
-  position: relative;
-  padding-top: 30%;
+.post-full .post_img {
+  background: #000;
+  display: flex;
+  align-items: center;
 }
-.post-user:not(:nth-child(3n)) {
-  margin-right: 5%;
+.post-full .post_img img {
+  width: auto;
+  max-height: 100%;
+  max-width: 100%;
 }
-.post-user:hover .likes {
-  opacity: 1;
+.post-full__description {
+  background: #fff;
+  width: 300px;
+  height: 100%;
+}
+.post-full__text {
+  height: 80%;
+  padding: 0 20px;
+}
+.post-full__new-comment {
+  height: 20%;
+  display: flex;
+  align-items: flex-end;
+}
+.post-full__overflow {
+  overflow: auto;
+  max-height: 280px;
+}
+.post__content {
+  padding: 10px 20px;
+}
+.mobile {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+@media screen and (max-width: 860px) {
+  .post-full {
+    flex-direction: column;
+    background: #fff;
+    max-height: unset;
+  }
+  .post-full .post_img {
+    display: block;
+    background: transparent;
+  }
+  .mobile {
+    display: block;
+  }
+  .desktop {
+    display: none;
+  }
 }
 </style>

@@ -1,5 +1,5 @@
 import Errors from './Error.js'
-import axios from 'axios'
+import axios from '../configs/axios'
 export default class Form {
   constructor (data) {
     this.originalData = data

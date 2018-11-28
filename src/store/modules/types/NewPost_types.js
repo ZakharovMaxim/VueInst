@@ -1,0 +1,7 @@
+export const INIT_FILTER = 'initFilters'
+export const ADD_FILTER = 'addFilter'
+export const REMOVE_FILTER = 'removeFilter'
+export const CHANGE_FILTER_VALUE = 'changeFilterValue'
+export const SET_FILTERS = 'setFilters'
+export const PRE_SAVE = 'preSave'
+export const SAVE_POST = 'savePost'

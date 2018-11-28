@@ -9,6 +9,16 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 Vue.prototype.$settings = settings
+Vue.directive('title', {
+  inserted (el, binding) {
+    if (!binding.value) return
+    document.title = binding.value
+  },
+  update (el, binding) {
+    if (!binding.value) return
+    document.title = binding.value
+  }
+})
 new Vue({
   el: '#app',
   router,

@@ -1,37 +1,45 @@
 <template>
-  <div id="app">
+  <div id='app'>
     <router-view></router-view>
     <router-view name='list'></router-view>
-    <sticky />
+    <Snackbar />
   </div>
 </template>
 
 <script>
-import {mapActions} from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import debounce from './tools/Debounce'
 import Network from './tools/Network'
-import sticky from './components/sticky'
+import Snackbar from './components/global/Snackbar'
+import {LOGOUT, INIT_AUTH} from './store/modules/types/Auth_types'
+import {FIX_NAVIGATION, UN_FIX_NAVIGATION} from './store/modules/types/App_types'
 export default {
   name: 'App',
   created () {
-    this.getToken()
+    this.initAuth()
+    if (!this.isAuth && this.$route.path === '/') {
+      this.$router.replace('/')
+    }
     Network.initInterceptors(this)
-    const callback = debounce((e) => this.fixNavigation(e), 100)
+    const callback = debounce((e) => this.checkTopOffset(e), 100)
     window.addEventListener('scroll', callback)
   },
   methods: {
-    ...mapActions(['removeToken', 'getToken']),
-    fixNavigation (e) {
+    ...mapActions([LOGOUT, INIT_AUTH, FIX_NAVIGATION, UN_FIX_NAVIGATION]),
+    checkTopOffset (e) {
       if (!e) return
       const w = window
       if (w.scrollY > 300) {
-        this.$store.dispatch('fixNavigation')
+        this[FIX_NAVIGATION]()
       } else {
-        this.$store.dispatch('unFixNavigation')
+        this[UN_FIX_NAVIGATION]()
       }
     }
   },
-  components: {sticky}
+  components: { Snackbar },
+  computed: {
+    ...mapGetters(['isAuth'])
+  }
 }
 </script>
 
@@ -51,6 +59,12 @@ body, html, #app {
   width: 100%;
   max-width: 860px;
   margin: 0 auto;
+}
+@media screen and (max-width: 860px) {
+  .content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
 .w100 {
     width: 100%;

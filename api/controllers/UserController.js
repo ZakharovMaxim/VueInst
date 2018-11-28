@@ -354,6 +354,8 @@ function returnUserList (obj, subj, req, res, next) {
         })
         if (~index) {
           item.subscribed = true
+        } else {
+          item.subscribed = false
         }
       })
       res.send({list})

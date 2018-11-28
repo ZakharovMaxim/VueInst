@@ -1,0 +1,6 @@
+export const SET_POSTS = 'setPosts'
+export const LIKE = 'like'
+export const DISLIKE = 'dislike'
+export const NEW_COMMENT = 'newComment'
+export const REMOVE_COMMENT = 'removeComment'
+export const REMOVE_POST = 'removePost'

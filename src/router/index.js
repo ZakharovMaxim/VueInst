@@ -1,10 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import { store } from '../store/store'
-const mainPage = () => import('../pages/main.vue')
-const userPage = () => import('../pages/user.vue')
-const userSettings = () => import('../pages/user-settings.vue')
-const list = () => import('../components/popup-list.vue')
+const mainPage = () => import('@/views/MainPage.vue')
+const userPage = () => import('@/views/UserPage.vue')
+const userSettings = () => import('@/views/UserSettingsPage.vue')
+const list = () => import('@/views/UserList.vue')
 Vue.use(Router)
 
 const routes = [
@@ -30,7 +29,8 @@ const routes = [
       default: false,
       list: {
         type: 'Подписчики',
-        callback: 'getSubscribers'
+        setter: 'setSubscribers',
+        getter: 'getSubscribers'
       }
     }
   },
@@ -44,7 +44,8 @@ const routes = [
       default: false,
       list: {
         type: 'Подписки',
-        callback: 'getSubscribes'
+        setter: 'setSubscribes',
+        getter: 'getSubscribes'
       }
     }
   }
@@ -54,9 +55,4 @@ const router = new Router({
   routes
 })
 
-router.afterEach((to, from) => {
-  if (to.path !== '/' && !store.getters.isAuth) {
-    router.replace('/')
-  }
-})
 export default router

@@ -29,6 +29,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 });*/
 app.use('/', index);
 app.use('/user', user);
+app.post('/test', function (req, res, next) {
+  console.log(req.body);
+  if(req.body.email === 'maxy121997@mail.ru') {
+    return res.status(422).send('Вы уже подписались')
+  } else {
+    return res.send('OK')
+  }
+})
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   const err = new Error('Not Found');

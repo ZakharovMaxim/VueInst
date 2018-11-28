@@ -6,6 +6,7 @@ const Network = {
       const token = localStorage.getItem('token')
       if (config.headers['Authorization']) {
         config.headers['Authorization'] = `JWT ${token}`
+        config.headers['withCredentials'] = true
       }
       return config
     })
@@ -16,13 +17,13 @@ const Network = {
     }, function (error) {
       console.dir(error)
       if ((!error.response || error.response.status === 500 || error.status === 500) && instance.$sticky) {
-        instance.$sticky.add({
+        instance.$VueInst_Snackbar.add({
           text: error.message,
           type: 'error'
         })
       }
-      if (error.response && error.response.status === 401 && instance.removeToken) {
-        instance.removeToken()
+      if (error.response && error.response.status === 401 && instance.logout) {
+        instance.logout()
         // instance.$router.push('/')
       } else {
         return Promise.reject(error)

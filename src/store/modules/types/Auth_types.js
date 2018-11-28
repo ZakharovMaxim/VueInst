@@ -1,0 +1,5 @@
+export const SET_AUTH = 'setAuth'
+export const INIT_AUTH = 'initAuth'
+export const LOGOUT = 'logout'
+export const UPDATE_USER_INFO = 'updateUserInfo'
+export const SET_TOKEN = 'setToken'
